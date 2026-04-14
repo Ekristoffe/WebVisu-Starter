@@ -10,16 +10,33 @@ public class NetworkAddress {
     private static final Logger LOGGER = Logger.getLogger(NetworkAddress.class.getName());
 
     
+    public static int portSplitter(String sAddress) {
+        try {
+            String[] _Split = sAddress.split(":");
+            if (_Split.length != 2) {
+                return 0;
+            }
+            int _iPort = Integer.parseInt(_Split[1]);
+            return _iPort;
+        } catch (NumberFormatException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            return 0;
+        }
+    }
+    
     public static String addressResolver(String sAddress) {
         try {
-            InetAddress ipAddress = InetAddress.getByName(sAddress);
-            sAddress = ipAddress.getHostAddress();
-            return sAddress;
+            String[] _Split = sAddress.split(":");
+            String _sHost = _Split[0];
+            InetAddress ipAddress = InetAddress.getByName(_sHost);
+            String _sAddress = ipAddress.getHostAddress();
+            return _sAddress;
         } catch (UnknownHostException ex) {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
             return null;
         }
     }
+    
     public static boolean addressChecker(String sAddress) {
         
         try {

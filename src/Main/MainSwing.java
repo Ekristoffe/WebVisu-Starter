@@ -213,6 +213,8 @@ public class MainSwing extends javax.swing.JFrame {
                 String _sPath = "/PLC/";
 
                 String _sIP;
+                int _iPort;
+                _iPort = NetworkAddress.portSplitter(_sAddress);
                 _sIP = NetworkAddress.addressResolver(_sAddress);
                 if (NetworkAddress.addressChecker(_sIP)) {
                     Integer _iTimeout = 0;
@@ -220,11 +222,15 @@ public class MainSwing extends javax.swing.JFrame {
                     if (!(_xPing) || Ping.isReachable(_sIP, _iTimeout)) {
                         Boolean _xHTTPs;
                         Action_Status_Text.setText("Detecting protocol.");
-                        _xHTTPs = HTTP_HTTPs.checkHTTPs(_sIP);
+                        String _sHost = _sIP;
+                        if (_iPort != 0) {
+                            _sHost = _sIP + ":" + Integer.toString(_iPort);
+                        }
+                        _xHTTPs = HTTP_HTTPs.checkHTTPs(_sHost);
                         if (_xHTTPs != null) {
                             Integer _iWebvisu;
                             Action_Status_Text.setText("Downloading \"webvisu.htm\".");
-                            _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sIP);
+                            _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sHost);
                             switch (_iWebvisu) {
                                 case -1: // the webvisu is a HTML5 webvisu)
                                     LOGGER.log(Level.WARNING, "HTML5 webvisu detected at ''{0}'' ({1})!", new Object[]{_sAddress, _sIP});
@@ -245,15 +251,19 @@ public class MainSwing extends javax.swing.JFrame {
                                     break;
                                 case 4: // the webvisu is for an IPC (path ":8080/")
                                     _sPath = ":8080/";
+                                    if (_iPort != 0) {
+                                        _sPath = "/";
+                                        _sHost = _sIP + ":" + Integer.toString(_iPort);
+                                    }
                                     break;
                             }
                             if (!LocalFiles.checkFile(WEBVISU_JAR)) {
                                 Action_Status_Text.setText("Downloading \"" + WEBVISU_JAR + "\".");
-                                HTTP_HTTPs.downloadURL(_xHTTPs, _sIP, _sPath, WEBVISU_JAR);
+                                HTTP_HTTPs.downloadURL(_xHTTPs, _sHost, _sPath, WEBVISU_JAR);
                             }
                             if (!LocalFiles.checkFile(MINML_JAR)) {
                                 Action_Status_Text.setText("Downloading \"" + MINML_JAR + "\".");
-                                HTTP_HTTPs.downloadURL(_xHTTPs, _sIP, _sPath, MINML_JAR);
+                                HTTP_HTTPs.downloadURL(_xHTTPs, _sHost, _sPath, MINML_JAR);
                             }
 
                             //Create a new list of station to be filled by CSV file data 
@@ -262,7 +272,7 @@ public class MainSwing extends javax.swing.JFrame {
                             alAppletParameter = ParseApplet.parseHtmFile();
 
                             Action_Status_Text.setText("Creating \"webclient_conf.ini\".");
-                            CreateConf.writeConfFile(_xHTTPs, _sIP, _sPath, null, alAppletParameter);
+                            CreateConf.writeConfFile(_xHTTPs, _sHost, _sPath, null, alAppletParameter);
 
                             Action_Status_Text.setText("Starting the WebVisu.");
                             
