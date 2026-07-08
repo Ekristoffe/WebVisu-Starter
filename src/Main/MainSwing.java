@@ -214,8 +214,10 @@ public class MainSwing extends javax.swing.JFrame {
 
                 String _sIP;
                 int _iPort;
+                String _sPage;
                 _iPort = NetworkAddress.portSplitter(_sAddress);
                 _sIP = NetworkAddress.addressResolver(_sAddress);
+                _sPage = NetworkAddress.pageSplitter(_sAddress);
                 if (NetworkAddress.addressChecker(_sIP)) {
                     Integer _iTimeout = 0;
                     Action_Status_Text.setText("Testing communication.");
@@ -229,8 +231,8 @@ public class MainSwing extends javax.swing.JFrame {
                         _xHTTPs = HTTP_HTTPs.checkHTTPs(_sHost);
                         if (_xHTTPs != null) {
                             Integer _iWebvisu;
-                            Action_Status_Text.setText("Downloading \"webvisu.htm\".");
-                            _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sHost);
+                            Action_Status_Text.setText("Downloading \"" + _sPage + "\".");
+                            _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sHost, _sPage);
                             switch (_iWebvisu) {
                                 case -1: // the webvisu is a HTML5 webvisu)
                                     LOGGER.log(Level.WARNING, "HTML5 webvisu detected at ''{0}'' ({1})!", new Object[]{_sAddress, _sIP});
@@ -269,14 +271,14 @@ public class MainSwing extends javax.swing.JFrame {
                             //Create a new list of station to be filled by CSV file data 
                             ArrayList<AppletParameter> alAppletParameter;
 
-                            alAppletParameter = ParseApplet.parseHtmFile();
+                            alAppletParameter = ParseApplet.parseHtmFile(_sPage);
 
                             Action_Status_Text.setText("Creating \"webclient_conf.ini\".");
                             CreateConf.writeConfFile(_xHTTPs, _sHost, _sPath, null, alAppletParameter);
 
                             Action_Status_Text.setText("Starting the WebVisu.");
                             
-                            LocalFiles.cleanFiles("webvisu.htm");
+                            LocalFiles.cleanFiles(_sPage);
                             
                             RunJavaWebVisu.runJavaWebVisu(_sIP);
 

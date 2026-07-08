@@ -57,3 +57,8 @@ nb-configuration.xml
 release.properties
 pom.xml.releaseBackup
 pom.xml.tag
+webVisuKeyStore.jks
+webvisu.jar
+webclient_conf.ini
+minml.jar
+log_*.txt

@@ -9,7 +9,7 @@ public class Version {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static String version() {
         String _sVersion;
-        _sVersion = "v0.0.12";
+        _sVersion = "v0.0.14";
         System.out.println(_sVersion);
         return _sVersion;
     }
@@ -41,7 +41,11 @@ public class Version {
                 + "\r\n" + "\t" + "v0.0.11"
                 + "\r\n" + "\t" + "\t" + "Add an option to disable the PING command."
                 + "\r\n" + "\t" + "v0.0.12"
-                + "\r\n" + "\t" + "\t" + "Each Webvisu instance start in their own task.";
+                + "\r\n" + "\t" + "\t" + "Each Webvisu instance start in their own task."
+                + "\r\n" + "\t" + "v0.0.13"
+                + "\r\n" + "\t" + "\t" + "Add an option to use a specific port as IpAddress:Port (usefull for port forwarding or if the Webvisu port is not the default one)."
+                + "\r\n" + "\t" + "v0.0.14"
+                + "\r\n" + "\t" + "\t" + "Enable the visu selection by it's HTM/HTML page as IpAddress:Port/Page";
         System.out.println(_sChangeLog);
     }
 

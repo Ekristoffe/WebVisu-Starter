@@ -17,7 +17,7 @@ public class ParseApplet {
     private static final String APPLET_VALUE = "value=";
     private static final String APPLET_SEPARATOR = "\"";
 
-    public static ArrayList<AppletParameter> parseHtmFile() {
+    public static ArrayList<AppletParameter> parseHtmFile(String sPage) {
 
         BufferedReader _brFileReader = null;
 
@@ -28,7 +28,7 @@ public class ParseApplet {
             String _sLine;
 
             //Create the file reader
-            _brFileReader = new BufferedReader(new FileReader("webvisu.htm"));
+            _brFileReader = new BufferedReader(new FileReader(sPage));
 
             Integer _iAppletStart;
             Integer _iLineIndex;
@@ -98,6 +98,7 @@ public class ParseApplet {
     }
 
     public static void main(String[] args) {
-        parseHtmFile();
+        String _sPage = "webvisu.htm";
+        parseHtmFile(_sPage);
     }
 }

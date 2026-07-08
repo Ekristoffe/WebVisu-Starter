@@ -9,6 +9,23 @@ public class NetworkAddress {
 
     private static final Logger LOGGER = Logger.getLogger(NetworkAddress.class.getName());
 
+    public static String pageSplitter(String sAddress) {
+        try {
+            String[] _Split = sAddress.split("/");
+            if (_Split.length < 2) {
+                return "webvisu.htm";
+            }
+            String _sPage = _Split[_Split.length - 1];
+            _Split = _sPage.split(".");
+            if (_Split.length != 2) {
+                return "webvisu.htm";
+            }
+            return _sPage;
+        } catch (NumberFormatException ex) {
+            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            return null;
+        }
+    }
     
     public static int portSplitter(String sAddress) {
         try {
@@ -16,7 +33,13 @@ public class NetworkAddress {
             if (_Split.length != 2) {
                 return 0;
             }
-            int _iPort = Integer.parseInt(_Split[1]);
+            String _sPort = _Split[1];
+            _Split = _sPort.split("/");
+            if (_Split.length >= 2) {
+                int _iPort = Integer.parseInt(_Split[0]);
+                return _iPort;
+            }
+            int _iPort = Integer.parseInt(_sPort);
             return _iPort;
         } catch (NumberFormatException ex) {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -26,8 +49,10 @@ public class NetworkAddress {
     
     public static String addressResolver(String sAddress) {
         try {
-            String[] _Split = sAddress.split(":");
+            String[] _Split = sAddress.split("/");
             String _sHost = _Split[0];
+            _Split = _sHost.split(":");
+            _sHost = _Split[0];
             InetAddress ipAddress = InetAddress.getByName(_sHost);
             String _sAddress = ipAddress.getHostAddress();
             return _sAddress;

@@ -78,8 +78,9 @@ public class CreateConf {
         ArrayList<AppletParameter> alAppletParameter;
 
         String _sIP = "192.168.0.4"; //needs to be replaced with local file path
+        String _sPage = "webvisu.htm";
 
-        alAppletParameter = ParseApplet.parseHtmFile();
+        alAppletParameter = ParseApplet.parseHtmFile(_sPage);
 
         writeConfFile(false, _sIP, "/PLC/", null, alAppletParameter);
     }

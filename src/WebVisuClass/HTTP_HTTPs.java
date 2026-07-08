@@ -461,7 +461,7 @@ public class HTTP_HTTPs {
         return _xHTTPs;
     }
 
-    public static Integer downloadWebVisu(Boolean xHttps, String sIP) {
+    public static Integer downloadWebVisu(Boolean xHttps, String sIP, String sPage) {
 
         Integer _iWebvisu = 0;
         String _sURL;
@@ -486,19 +486,19 @@ public class HTTP_HTTPs {
             _iWebvisu += 1;
             switch (_iWebvisu) {
                 case 1: // the webvisu is direct (port 80, path "")
-                    _sTestURL = _sURL + "/webvisu.htm";
+                    _sTestURL = _sURL + "/" + sPage;
                     break;
                 case 2: // the webvisu is for a 750-88x (port 80, path "/plc/")
-                    _sTestURL = _sURL + "/plc/webvisu.htm";
+                    _sTestURL = _sURL + "/plc/" + sPage;
                     break;
                 case 3: // the webvisu is for an PFC (port 80, path "/webvisu/")
-                    _sTestURL = _sURL + "/webvisu/webvisu.htm";
+                    _sTestURL = _sURL + "/webvisu/" + sPage;
                     break;
                 case 4: // the webvisu is for an pfc (port 8080, path "")
                     _sTestURL = _sURL + ":8080";
                     break;
                 case 5: // the webvisu is for an IPC (port 8080, path "")
-                    _sTestURL = _sURL + ":8080/webvisu.htm";
+                    _sTestURL = _sURL + ":8080/" + sPage;
                     break;
                 default:
                     return (0);
@@ -551,7 +551,7 @@ public class HTTP_HTTPs {
                                         if (_sWebVisuHtm.contains("<APPLET")) {
                                             // CoDeSys 2.3 WebVisu
 
-                                            String _sFileName = "webvisu.htm";
+                                            String _sFileName = sPage;
                                             FileWriter _fileWriter = null;
 
                                             try {
@@ -559,7 +559,7 @@ public class HTTP_HTTPs {
                                                 _fileWriter = new FileWriter(_sFileName, false);
                                                 _fileWriter.append(_sWebVisuHtm);
 
-                                                LOGGER.log(Level.FINE, "webvisu.htm file was created successfully !!!");
+                                                LOGGER.log(Level.FINE, sPage + " file was created successfully !!!");
 
                                             } catch (FileNotFoundException ex) {
                                                 LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -635,7 +635,7 @@ public class HTTP_HTTPs {
 
                                 if (_sWebVisuHtm.contains("<APPLET")) {
 
-                                    String _sFileName = "webvisu.htm";
+                                    String _sFileName = sPage;
                                     FileWriter _fileWriter = null;
 
                                     try {
@@ -643,7 +643,7 @@ public class HTTP_HTTPs {
                                         _fileWriter = new FileWriter(_sFileName, false);
                                         _fileWriter.append(_sWebVisuHtm);
 
-                                        LOGGER.log(Level.FINE, "webvisu.htm file was created successfully !!!");
+                                        LOGGER.log(Level.FINE, sPage + " file was created successfully !!!");
 
                                     } catch (FileNotFoundException ex) {
                                         LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -920,7 +920,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -966,7 +966,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -1009,7 +1009,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -1052,7 +1052,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -1095,7 +1095,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -1138,7 +1138,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {
@@ -1181,7 +1181,7 @@ public class HTTP_HTTPs {
         _xHTTPs = checkHTTPs(_sIP);
         LOGGER.log(Level.INFO, "Is {0} HTTPs: {1}", new Object[]{_sIP, _xHTTPs});
         if (_xHTTPs != null) {
-            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP);
+            _iWebvisuhtm = downloadWebVisu(_xHTTPs, _sIP, _sWebvisuhtm);
             LOGGER.log(Level.INFO, "{0} Webvisu type: {1}", new Object[]{_sIP, _iWebvisuhtm});
             if (_iWebvisuhtm != 0) {
                 switch (_iWebvisuhtm) {

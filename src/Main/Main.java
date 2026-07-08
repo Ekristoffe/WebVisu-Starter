@@ -95,15 +95,23 @@ public class Main {
 
         String _sPath = "/PLC/";
         String _sIP;
+        int _iPort;
+        String _sPage;
+        _iPort = NetworkAddress.portSplitter(sAddress);
         _sIP = NetworkAddress.addressResolver(sAddress);
+        _sPage = NetworkAddress.pageSplitter(sAddress);
         if (NetworkAddress.addressChecker(_sIP)) {
             Integer _iTimeout = 0;
             if (xNoPing || Ping.isReachable(_sIP, _iTimeout)) {
                 Boolean _xHTTPs;
-                _xHTTPs = HTTP_HTTPs.checkHTTPs(_sIP);
+                String _sHost = _sIP;
+                if (_iPort != 0) {
+                    _sHost = _sIP + ":" + Integer.toString(_iPort);
+                }
+                _xHTTPs = HTTP_HTTPs.checkHTTPs(_sHost);
                 if (_xHTTPs != null) {
                     Integer _iWebvisu;
-                    _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sIP);
+                    _iWebvisu = HTTP_HTTPs.downloadWebVisu(_xHTTPs, _sHost, _sPage);
                     switch (_iWebvisu) {
                         case -1: // the webvisu is a HTML5 webvisu)
                             LOGGER.log(Level.WARNING, "HTML5 webvisu detected at ''{0}'' ({1})!", new Object[]{sAddress, _sIP});
@@ -122,23 +130,27 @@ public class Main {
                             break;
                         case 4: // the webvisu is for an IPC (path ":8080/")
                             _sPath = ":8080/";
+                            if (_iPort != 0) {
+                                _sPath = "/";
+                                _sHost = _sIP + ":" + Integer.toString(_iPort);
+                            }
                             break;
                     }
                     if (!LocalFiles.checkFile(WEBVISU_JAR)) {
-                        HTTP_HTTPs.downloadURL(_xHTTPs, _sIP, _sPath, WEBVISU_JAR);
+                        HTTP_HTTPs.downloadURL(_xHTTPs, _sHost, _sPath, WEBVISU_JAR);
                     }
                     if (!LocalFiles.checkFile(MINML_JAR)) {
-                        HTTP_HTTPs.downloadURL(_xHTTPs, _sIP, _sPath, MINML_JAR);
+                        HTTP_HTTPs.downloadURL(_xHTTPs, _sHost, _sPath, MINML_JAR);
                     }
 
                     //Create a new list of station to be filled by CSV file data 
                     ArrayList<AppletParameter> alAppletParameter;
 
-                    alAppletParameter = ParseApplet.parseHtmFile();
+                    alAppletParameter = ParseApplet.parseHtmFile(_sPage);
 
-                    CreateConf.writeConfFile(_xHTTPs, _sIP, _sPath, sVisu, alAppletParameter);
+                    CreateConf.writeConfFile(_xHTTPs, _sHost, _sPath, sVisu, alAppletParameter);
 
-                    LocalFiles.cleanFiles("webvisu.htm");
+                    LocalFiles.cleanFiles(_sPage);
                     
                     RunJavaWebVisu.runJavaWebVisu(_sIP);
 
