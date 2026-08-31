@@ -53,9 +53,9 @@
 インストールが完了したら、[完了] をクリックします。  
  ![Temurin 6](https://github.com/Ekristoffe/WebVisu-Starter/blob/main/images/Temurin_JP_6.png?raw=true)  
 
- </details>
+ </details>  
 
-<br>
+ ### Webvisu Starter
 
  右側のリンクから Releases ページ を開きます。  
  <https://github.com/Ekristoffe/WebVisu-Starter/releases>

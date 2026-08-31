@@ -60,9 +60,9 @@ Documentation
  When the installation is complete, click [Finish]  
  ![Temurin 6](https://github.com/Ekristoffe/WebVisu-Starter/blob/main/images/Temurin_EN_6.png?raw=true)
 
- </details>
+ </details>  
 
-<br>
+ ### Webvisu Starter
 
  Open the Releases page: <https://github.com/Ekristoffe/WebVisu-Starter/releases> from the right panel link.  
  Click on the latest Webvisu_Starter.jar to begin the download.  
