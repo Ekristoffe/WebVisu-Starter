@@ -1,4 +1,4 @@
-[English](https://github.com/Ekristoffe/WebVisu-Starter) / [日本語](README-JP.md)
+[![English](https://img.shields.io/badge/lang-English-blue.svg)](https://github.com/Ekristoffe/WebVisu-Starter) / [![日本語](https://img.shields.io/badge/lang-日本語-red.svg)](README.ja.md)
 
 # WebVisu Starter
  CoDeSys 2.3 または WAGO-I/O-PRO CAA IDE を使用する Ethernet コントローラ向けの WebVisu 機能は、Web ブラウザを通じてリアルタイムモニタリングを可能にします。従来、この機能は Oracle Java™ Applet テクノロジーに依存していました。  

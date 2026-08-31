@@ -1,4 +1,4 @@
-[English](https://github.com/Ekristoffe/WebVisu-Starter) / [日本語](README-JP.md)
+[![English](https://img.shields.io/badge/lang-English-blue.svg)](https://github.com/Ekristoffe/WebVisu-Starter) / [![日本語](https://img.shields.io/badge/lang-日本語-red.svg)](README.ja.md)
 
 # WebVisu Starter
  The WebVisu function for Ethernet controllers using CoDeSys 2.3 or WAGO-I/O-PRO CAA IDE enables real-time monitoring through a web browser. 
