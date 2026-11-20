@@ -783,6 +783,9 @@ public class HTTP_HTTPs {
                                         _sURL = _HTTPscon.getHeaderField("Location");
                                         _iWebvisu -= 1;
                                         break;
+                                    default :
+                                        _iWebvisu = 0;
+                                        break;
                                 }
                             } catch (SSLException ex) {
                                 LOGGER.log(Level.SEVERE, ex.toString(), ex);

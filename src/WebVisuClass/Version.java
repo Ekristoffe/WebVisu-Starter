@@ -47,7 +47,7 @@ public class Version {
                 + "\r\n" + "\t" + "v0.0.14"
                 + "\r\n" + "\t" + "\t" + "Enable the visu selection by it's HTM/HTML page as IpAddress:Port/Page"
                 + "\r\n" + "\t" + "v0.0.15"
-                + "\r\n" + "\t" + "\t" + "Update the ssl system for the new SAN certificate requirement. Need to be started as Administrator to add the proper certificate to the java certificate management, after it can be run as normal user.";
+                + "\r\n" + "\t" + "\t" + "Update the SSL system for the new SAN certificate requirement. Need to be started as Administrator to add the proper certificate to the java certificate management, after it can be run as normal user.";
         System.out.println(_sChangeLog);
     }
 

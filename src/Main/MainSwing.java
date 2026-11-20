@@ -254,6 +254,9 @@ public class MainSwing extends javax.swing.JFrame {
                                         _sHost = _sIP + ":" + Integer.toString(_iPort);
                                     }
                                     break;
+                                default: // Unknown
+                                    LOGGER.log(Level.WARNING, "Cannot define ''{0}'' ({1})!", new Object[]{_sAddress, _sIP});
+                                    return null;
                             }
                             if (!LocalFiles.checkFile(WEBVISU_JAR)) {
                                 Action_Status_Text.setText("Downloading \"" + WEBVISU_JAR + "\".");

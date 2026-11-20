@@ -135,6 +135,9 @@ public class Main {
                                 _sHost = _sIP + ":" + Integer.toString(_iPort);
                             }
                             break;
+                        default: // Unknown
+                            LOGGER.log(Level.WARNING, "Cannot define ''{0}'' ({1})!", new Object[]{sAddress, _sIP});
+                            return;
                     }
                     if (!LocalFiles.checkFile(WEBVISU_JAR)) {
                         HTTP_HTTPs.downloadURL(_xHTTPs, _sHost, _sPath, WEBVISU_JAR);
