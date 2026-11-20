@@ -152,7 +152,7 @@ public class Main {
 
                     LocalFiles.cleanFiles(_sPage);
                     
-                    RunJavaWebVisu.runJavaWebVisu(_sIP);
+                    RunJavaWebVisu.runJavaWebVisu(_xHTTPs, _sIP);
 
                 } else {
                     LOGGER.log(Level.WARNING, "HTTP/HTTPs not supported at ''{0}'' ({1})!", new Object[]{sAddress, _sIP});

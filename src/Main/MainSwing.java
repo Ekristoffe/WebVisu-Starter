@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Image;
 import java.awt.Toolkit;
-import javax.imageio.ImageIO;
+//import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
@@ -50,7 +50,6 @@ public class MainSwing extends javax.swing.JFrame {
         No_Ping_CheckBox.setIcon(Image_1);
         No_Ping_CheckBox.setSelectedIcon(Image_2);
         IP_Address_TextField.setBorder(BorderFactory.createCompoundBorder(IP_Address_TextField.getBorder(), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
-
     }
 
     /**
@@ -87,7 +86,6 @@ public class MainSwing extends javax.swing.JFrame {
         jLabel1.setMinimumSize(new java.awt.Dimension(67, 25));
         jLabel1.setPreferredSize(new java.awt.Dimension(67, 25));
 
-        IP_Address_TextField.setBackground(new java.awt.Color(255, 255, 255));
         IP_Address_TextField.setForeground(new java.awt.Color(33, 150, 243));
         IP_Address_TextField.setToolTipText("URL of the WebVisu, update it with the IP address of the controller");
         IP_Address_TextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(60, 63, 65), 1, true));
@@ -159,12 +157,10 @@ public class MainSwing extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addComponent(IP_Address_TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(IP_Address_TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(Submit_Button, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -280,7 +276,7 @@ public class MainSwing extends javax.swing.JFrame {
                             
                             LocalFiles.cleanFiles(_sPage);
                             
-                            RunJavaWebVisu.runJavaWebVisu(_sIP);
+                            RunJavaWebVisu.runJavaWebVisu(_xHTTPs, _sIP);
 
                             Action_Status_Text.setText("Done.");
                         } else {

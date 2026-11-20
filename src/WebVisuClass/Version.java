@@ -1,15 +1,15 @@
 package WebVisuClass;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 public class Version {
 
-    private static final Logger LOGGER = Logger.getLogger(Version.class.getName());
+    //private static final Logger LOGGER = Logger.getLogger(Version.class.getName());
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public static String version() {
         String _sVersion;
-        _sVersion = "v0.0.14";
+        _sVersion = "v0.0.15";
         System.out.println(_sVersion);
         return _sVersion;
     }
@@ -45,7 +45,9 @@ public class Version {
                 + "\r\n" + "\t" + "v0.0.13"
                 + "\r\n" + "\t" + "\t" + "Add an option to use a specific port as IpAddress:Port (usefull for port forwarding or if the Webvisu port is not the default one)."
                 + "\r\n" + "\t" + "v0.0.14"
-                + "\r\n" + "\t" + "\t" + "Enable the visu selection by it's HTM/HTML page as IpAddress:Port/Page";
+                + "\r\n" + "\t" + "\t" + "Enable the visu selection by it's HTM/HTML page as IpAddress:Port/Page"
+                + "\r\n" + "\t" + "v0.0.15"
+                + "\r\n" + "\t" + "\t" + "Update the ssl system for the new SAN certificate requirement. Need to be started as Administrator to add the proper certificate to the java certificate management, after it can be run as normal user.";
         System.out.println(_sChangeLog);
     }
 
@@ -56,7 +58,7 @@ public class Version {
                 + "\r\n" + "\t" + "-c" + "\t" + "\t" + "Print the Changelog"
                 + "\r\n" + "\t" + "-v" + "\t" + "\t" + "Print the Version Number."
                 + "\r\n" + "\t" + "-h" + "\t" + "\t" + "Print this help"
-                + "\r\n" + "\t" + "-ip IP" + "\t" + "\t" + "Connect to the defined IP address."
+                + "\r\n" + "\t" + "-ip IP" + "\t" + "\t" + "Connect to the defined IP address.\r\n\t\tThe format can be:\r\n\t\t\t[URL]\r\n\t\t\t[IP]\r\n\t\t\t[IP]:[Port]\r\n\t\t\t[IP]/[webpage].htm\r\n\t\t\t[IP]:[Port]/[webpage].htm"
                 + "\r\n" + "\t" + "-np" + "\t" + "\t" + "Disable the PING command."
                 + "\r\n" + "\t" + "-visu STARTVISU" + "\t" + "Force the Start page of the WebVisu (Default: PLC_VISU)";
         System.out.println(_sHelp);

@@ -15,14 +15,20 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+//import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.HostnameVerifier;
@@ -45,12 +51,15 @@ public class HTTP_HTTPs {
 
     private static final String KEY_STORE_PASS = "changeit";
     private static final String KEY_STORE_FILE = "webVisuKeyStore.jks";
+    private static final String CA_FILE = "ca-cert.pem";
+    //private String javaHome = System.getProperty("java.home");
+    //private static final String GLOBAL_KEY_STORE_FILE = "%JAVA_HOME%jre\\lib\\security\\cacerts";
     private static KeyStore ksKeyStore;
     private static SavingTrustManager stmSavingTrustManager;
     private static X509TrustManager tmTrustManager;
 
     private static final Logger LOGGER = Logger.getLogger(HTTP_HTTPs.class.getName());
-
+    
     // Author: AndreasSterbenz: InstallCertJFrame.java
     // Created on 22 September 2008, 13:21
     // Edit: Christophe ICARD
@@ -103,24 +112,52 @@ public class HTTP_HTTPs {
         }
         LOGGER.log(Level.INFO, "Added certificate to keystore ''{0}'' using alias ''{1}''", new Object[]{KEY_STORE_FILE, alias});
     }
+    
+    public static String convertToPem(X509Certificate[] certChain) throws CertificateEncodingException {
+        if (certChain == null || certChain.length == 0) {
+            return "";
+        }
 
+        StringBuilder pemBuilder = new StringBuilder();
+        // Base64 encoder configured to insert a line break every 64 characters
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, new byte[]{'\n'});
+
+        for (X509Certificate cert : certChain) {
+            pemBuilder.append("-----BEGIN CERTIFICATE-----\n");
+
+            // Get the raw DER-encoded bytes of the certificate
+            byte[] derEncoded = cert.getEncoded();
+            String base64Encoded = encoder.encodeToString(derEncoded);
+
+            pemBuilder.append(base64Encoded);
+
+            // Ensure the block ends cleanly with a newline before the footer
+            if (!base64Encoded.endsWith("\n")) {
+                pemBuilder.append("\n");
+            }
+            pemBuilder.append("-----END CERTIFICATE-----\n");
+        }
+
+        return pemBuilder.toString();
+    }
+    
     // Author: AndreasSterbenz: InstallCertJFrame.java
     // Created on 22 September 2008, 13:21
     // Edit: Christophe ICARD
     public static void loadKeyStore() {
         try {
-            LOGGER.log(Level.FINE, "Loading KeyStore ...");
+            LOGGER.log(Level.INFO, "Loading KeyStore ...");
             // Check if we have a local KeyStore
             File _fKeyStore = new File(KEY_STORE_FILE);
             if (!_fKeyStore.isFile()) {
-                LOGGER.log(Level.FINE, "Keystore {0} not found", _fKeyStore);
+                LOGGER.log(Level.INFO, "Keystore {0} not found", _fKeyStore);
                 File dir = new File(new File(System.getProperty("java.home"), "lib"), "security");
                 _fKeyStore = new File(dir, "jssecacerts");
                 if (!_fKeyStore.isFile()) {
-                    LOGGER.log(Level.FINE, "Keystore {0} not found", _fKeyStore);
+                    LOGGER.log(Level.INFO, "Keystore {0} not found", _fKeyStore);
                     _fKeyStore = new File(dir, "cacerts");
                     if (!_fKeyStore.isFile()) {
-                        LOGGER.log(Level.FINE, "Keystore {0} not found", _fKeyStore);
+                        LOGGER.log(Level.INFO, "Keystore {0} not found", _fKeyStore);
                     }
                 }
             }
@@ -135,7 +172,7 @@ public class HTTP_HTTPs {
             tmfTrustManagerFactory.init(ksKeyStore);
             tmTrustManager = (X509TrustManager) tmfTrustManagerFactory.getTrustManagers()[0];
             stmSavingTrustManager = new SavingTrustManager(tmTrustManager);
-
+            
             LOGGER.log(Level.FINE, "KeyStore {0} Loaded.", _fKeyStore);
 
         } catch (FileNotFoundException ex) {
@@ -192,18 +229,122 @@ public class HTTP_HTTPs {
         }
         return _sbHexByte.toString();
     }
+    
+    /* test */
+    public static void addX509CertificateToTrustStore(String certPath, String certAlias, String storePath, String storePassword, String storeType)
+            throws FileNotFoundException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+
+        char[] storePasswordCharArr = Objects.requireNonNull(storePassword, "").toCharArray();
+
+        KeyStore keystore;
+        try (FileInputStream storeInputStream = new FileInputStream(storePath);
+                FileInputStream certInputStream = new FileInputStream(certPath)) {
+            keystore = KeyStore.getInstance(storeType);
+            keystore.load(storeInputStream, storePasswordCharArr);
+
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            Certificate certificate = certificateFactory.generateCertificate(certInputStream);
+
+            keystore.setCertificateEntry(certAlias, certificate);
+        }
+
+        try (FileOutputStream storeOutputStream = new FileOutputStream(storePath)) {
+            keystore.store(storeOutputStream, storePasswordCharArr);
+        }
+    }
+    
+    public static void addPemToCacerts(String pemFilePath, String alias) throws Exception {
+        // 1. Locate the default cacerts file and define the default password
+        String javaHome = System.getProperty("java.home");
+        //String cacertsPath = Paths.get(javaHome, "lib", "security", "cacerts").toString();
+        // Define paths based on Java version architecture
+        File cacertsFile;
+        // Java 9 and above stores it directly in lib/security
+        cacertsFile = new File(javaHome, "lib" + File.separator + "security" + File.separator + "cacerts");
+        // Fallback for Java 8 and older versions which stored it under jre/lib/security
+        if (!cacertsFile.exists()) {
+            cacertsFile = new File(javaHome, "jre" + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts");
+        }
+        String cacertsPath = cacertsFile.getAbsolutePath();
+        char[] cacertsPass = "changeit".toCharArray(); // Standard default Java password
+
+        // 2. Load the existing cacerts KeyStore
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        try (FileInputStream fis = new FileInputStream(cacertsPath)) {
+            keyStore.load(fis, cacertsPass);
+        }
+
+        // 3. Parse the PEM certificate file
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        Certificate certificate;
+        try (FileInputStream fis = new FileInputStream(pemFilePath)) {
+            certificate = certFactory.generateCertificate(fis);
+        }
+
+        // 4. Add the certificate to the KeyStore
+        keyStore.setCertificateEntry(alias, certificate);
+
+        // 5. Write the modified KeyStore back to the cacerts file
+        try (FileOutputStream fos = new FileOutputStream(cacertsPath)) {
+            keyStore.store(fos, cacertsPass);
+        }
+        
+        System.out.println("Certificate successfully added with alias: " + alias);
+    }
+    /*
+    public static void main2(String[] argv) throws Exception {
+        String certfile = "yourcert.cer"; //your cert path
+        FileInputStream is = new FileInputStream("yourKeyStore.keystore");
+
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(is, "yourKeyStorePass".toCharArray());
+
+        String alias = "youralias";
+        char[] password = "yourKeyStorePass".toCharArray();
+
+        //////
+
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        InputStream certstream = fullStream (certfile);
+        Certificate certs =  cf.generateCertificate(certstream);
+
+        ///
+        File keystoreFile = new File("yourKeyStorePass.keystore");
+        // Load the keystore contents
+        FileInputStream in = new FileInputStream(keystoreFile);
+        keystore.load(in, password);
+        in.close();
+
+        // Add the certificate
+        keystore.setCertificateEntry(alias, certs);
+
+        // Save the new keystore contents
+        FileOutputStream out = new FileOutputStream(keystoreFile);
+        keystore.store(out, password);
+        out.close();
+    }
+    
+    private static InputStream fullStream ( String fname ) throws IOException {
+        FileInputStream fis = new FileInputStream(fname);
+        DataInputStream dis = new DataInputStream(fis);
+        byte[] bytes = new byte[dis.available()];
+        dis.readFully(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        return bais;
+    }
+     test */
 
     public static Boolean checkHTTPs(String sIP) {
-
+        
         Boolean _xHTTPs = null;
         String _sURL;
         String _sMethod = "HEAD";
         Integer _iResponceCode;
-
+        
         _sURL = "http://" + sIP;
-
+        
         System.setProperty("http.keepAlive", "false");
-
+        
         Boolean _xExitLoop = false;
         while (_xExitLoop == false) {
             URL _URL;
@@ -283,7 +424,7 @@ public class HTTP_HTTPs {
                             } catch (SSLException ex) {
                                 // Get the certificate
                                 X509Certificate[] _Cert = stmSavingTrustManager.getAcceptedIssuers();
-
+                                
                                 // Create the parser
                                 MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
                                 MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
@@ -373,7 +514,46 @@ public class HTTP_HTTPs {
                                 n = JOptionPane.showConfirmDialog(frame, sHTMLMessage,
                                         "Security Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null);
                                 if (n == JOptionPane.YES_OPTION) {
-                                    importCertificates(sIP, stmSavingTrustManager.getAcceptedIssuers()[0]);
+                                    /**/
+                                    // Convert the cert to a Pem file ready string
+                                    String _PemCert = convertToPem(_Cert);
+                                    try (FileOutputStream out = new FileOutputStream(CA_FILE)) {
+                                        out.write(_PemCert.getBytes());
+                                    }
+                                    LOGGER.log(Level.INFO, "Certificate : {0}", _PemCert);
+                                    
+                                    String certAlias = NetworkAddress.addressResolver(sIP);
+                                    LOGGER.log(Level.INFO, "certAlias: {0}", certAlias);
+                                    
+                                    /*
+                                    String javaHome = System.getProperty("java.home");
+                                    // Define paths based on Java version architecture
+                                    File cacertsFile;
+                                    // Java 9 and above stores it directly in lib/security
+                                    cacertsFile = new File(javaHome, "lib" + File.separator + "security" + File.separator + "cacerts");
+                                    // Fallback for Java 8 and older versions which stored it under jre/lib/security
+                                    if (!cacertsFile.exists()) {
+                                        cacertsFile = new File(javaHome, "jre" + File.separator + "lib" + File.separator + "security" + File.separator + "cacerts");
+                                    }
+                                    if (cacertsFile.exists()) {
+                                        String storePath = cacertsFile.getAbsolutePath();
+                                        LOGGER.log(Level.INFO, "Absolute Path: {0}", storePath);
+                                        // addX509CertificateToTrustStore(String certPath, String certAlias, String storePath, String storePassword, String storeType)
+                                        try {
+                                            addX509CertificateToTrustStore(CA_FILE, certAlias, storePath, KEY_STORE_PASS, "PKCS12");
+                                        } catch (Exception ex1) {
+                                            LOGGER.log(Level.SEVERE, ex1.toString(), ex1);
+                                        }
+                                    }
+                                    */
+                                    try {
+                                        addPemToCacerts(CA_FILE, certAlias);
+                                    } catch (Exception ex1) {
+                                        LOGGER.log(Level.SEVERE, ex1.toString(), ex1);
+                                    }
+                                    
+                                    LOGGER.log(Level.INFO, "Certificate : {0}", _Cert[0]);
+                                    importCertificates(sIP, _Cert[0]);
                                 } else {
                                     LOGGER.log(Level.FINE, "Certificate invalid: {0}", ex.toString());
                                     _xExitLoop = true;
@@ -457,7 +637,6 @@ public class HTTP_HTTPs {
                 _xHTTPs = null;
             }
         }
-
         return _xHTTPs;
     }
 
@@ -559,7 +738,7 @@ public class HTTP_HTTPs {
                                                 _fileWriter = new FileWriter(_sFileName, false);
                                                 _fileWriter.append(_sWebVisuHtm);
 
-                                                LOGGER.log(Level.FINE, sPage + " file was created successfully !!!");
+                                                LOGGER.log(Level.FINE, "{0} file was created successfully !!!", sPage);
 
                                             } catch (FileNotFoundException ex) {
                                                 LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -643,7 +822,7 @@ public class HTTP_HTTPs {
                                         _fileWriter = new FileWriter(_sFileName, false);
                                         _fileWriter.append(_sWebVisuHtm);
 
-                                        LOGGER.log(Level.FINE, sPage + " file was created successfully !!!");
+                                        LOGGER.log(Level.FINE,"{0} file was created successfully !!!", sPage);
 
                                     } catch (FileNotFoundException ex) {
                                         LOGGER.log(Level.SEVERE, ex.toString(), ex);
@@ -762,7 +941,7 @@ public class HTTP_HTTPs {
                                 } else {
                                     switch (_iResponceCode) {
                                         case HttpURLConnection.HTTP_OK:
-                                            Integer _FileSize = _HTTPscon.getContentLength();
+                                            //Integer _FileSize = _HTTPscon.getContentLength();
                                             //get connection inputstream
                                             InputStream in = _HTTPscon.getInputStream();
                                             FileOutputStream _fos = null;
@@ -836,7 +1015,7 @@ public class HTTP_HTTPs {
                         } else {
                             switch (_iResponceCode) {
                                 case HttpURLConnection.HTTP_OK:
-                                    Integer _FileSize = _HTTPcon.getContentLength();
+                                    //Integer _FileSize = _HTTPcon.getContentLength();
                                     //get connection inputstream
                                     InputStream in = _HTTPcon.getInputStream();
                                     FileOutputStream _fos = null;
@@ -1253,4 +1432,36 @@ public class HTTP_HTTPs {
             _tmTrustManager.checkServerTrusted(chain, authType);
         }
     }
+    /*
+    private static class CertificateConverter {
+
+        public static String convertToPem(X509Certificate[] certChain) throws CertificateEncodingException {
+            if (certChain == null || certChain.length == 0) {
+                return "";
+            }
+
+            StringBuilder pemBuilder = new StringBuilder();
+            // Base64 encoder configured to insert a line break every 64 characters
+            Base64.Encoder encoder = Base64.getMimeEncoder(64, new byte[]{'\n'});
+
+            for (X509Certificate cert : certChain) {
+                pemBuilder.append("-----BEGIN CERTIFICATE-----\n");
+
+                // Get the raw DER-encoded bytes of the certificate
+                byte[] derEncoded = cert.getEncoded();
+                String base64Encoded = encoder.encodeToString(derEncoded);
+
+                pemBuilder.append(base64Encoded);
+
+                // Ensure the block ends cleanly with a newline before the footer
+                if (!base64Encoded.endsWith("\n")) {
+                    pemBuilder.append("\n");
+                }
+                pemBuilder.append("-----END CERTIFICATE-----\n");
+            }
+
+            return pemBuilder.toString();
+        }
+    }
+    */
 }
